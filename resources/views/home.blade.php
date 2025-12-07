@@ -433,7 +433,7 @@ h1 {
     <a href="#home">Home</a>
     <a href="#about">About</a>
     <a href="#projects">Projects</a>
-    <a href="#contact">Contact</a>
+    <a href="#contact">Members</a>
   </nav>
 
   <!-- HOME SECTION -->
@@ -491,27 +491,15 @@ h1 {
       </div>
       <div class="project-card side left1" onclick="window.location.href='{{ url('/color_purple') }}'">
         <img src="images/color_purple.jpg" alt="Project 1">
-        <h3>Oedipus Rex</h3>
-        <h4>Author: Homer</h4>
-        <p>palitan*</p>
+        <h3>The Color Purple</h3>
+        <h4>Author: Alice Walker</h4>
+        <p>A young African-American woman overcomes abuse and oppression to find her voice and independence.</p>
       </div>
-      <div class="project-card side left2" onclick="window.location.href='{{ url('/robert') }}'">
-        <img src="images/robert.jpg" alt="Project 2">
-        <h3>Phaedra</h3>
-        <h4>Written by Jean Racine</h4>
-        <p>Quick info about project two.</p>
-      </div>
-      <div class="project-card side right1" onclick="window.location.href='{{ url('/project4') }}'">
-        <img src="images/project3.jpg" alt="Project 3">
-        <h3>Don Quixote</h3>
-        <h4>Made by Miguel de Cervantes</h4>
-        <p>Quick info about project three.</p>
-      </div>
-      <div class="project-card side right2" onclick="window.location.href='{{ url('/project5') }}'">
-        <img src="images/project4.jpg" alt="Project 4">
-        <h3>The Cask of Amontillado</h3>
-        <h4>Written by Edgar Allan Poe</h4>
-        <p>Quick info about project four.</p>
+      <div class="project-card side right1" onclick="window.location.href='{{ url('/robert') }}'">
+        <img src="images/road-not-taken.jpg" alt="Project 3">
+        <h3>The Road Not Taken</h3>
+        <h4>Made by Robert Sheet</h4>
+        <p>A traveler reflects on how choosing a less conventional path shapes the course of his life.</p>
       </div>
     </div>
     
@@ -525,19 +513,18 @@ h1 {
 
   <div class="contact-container">
     <div class="contact-card">
-      <img src="images/member1.jpg" alt="Member 1" class="contact-img">
       <h3>Sarah C. Abane</h3>
     </div>
     <div class="contact-card">
-      <img src="images/member2.jpg" alt="Member 2" class="contact-img">
       <h3>Elaine Mae A. Bertiz</h3>
     </div>
     <div class="contact-card">
-      <img src="images/member3.jpg" alt="Member 3" class="contact-img">
       <h3>Richard D. Bilan</h3>
     </div>
     <div class="contact-card">
-      <img src="images/member4.jpg" alt="Member 4" class="contact-img">
+      <h3>Annika Gail Cipriano</h3>
+    </div>
+    <div class="contact-card">
       <h3>Lord Zaro Fiber A. Quintanilla</h3>
     </div>
   </div>
@@ -680,7 +667,7 @@ centerCard.addEventListener("click", (e) => {
 
   clickTimer = setTimeout(() => {
     // Navigate to project1 route
-    window.location.href = "{{ url('/iliad') }}";
+    window.location.href = "{{ url('/opening-iliad') }}";
     clickTimer = null;
   }, 250); // 250ms delay to check for dblclick
 });

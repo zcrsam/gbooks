@@ -7,10 +7,18 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+Route::get('/opening-iliad', function () {
+    return view('opening-iliad');
+})->name('opening-iliad');
+
 // Projects
 Route::get('/iliad', function () {
     return view('iliad');
 })->name('iliad');
+
+Route::get('/opening-purple', function () {
+    return view('opening-purple');
+})->name('opening-purple');
 
 Route::get('/color_purple', function () {
     return view('color_purple');
@@ -19,11 +27,3 @@ Route::get('/color_purple', function () {
 Route::get('/robert', function () {
     return view('robert');
 })->name('robert');
-
-Route::get('/project4', function () {
-    return view('project4');
-})->name('project4');
-
-Route::get('/project5', function () {
-    return view('project5');
-})->name('project5');

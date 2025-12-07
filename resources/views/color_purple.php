@@ -1,277 +1,505 @@
+<?php
+$homeUrl = route('home');
+?>
+<script>
+    window.homeUrl = "<?php echo $homeUrl; ?>";
+</script>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oedipus Rex — Interactive Archive</title>
+<title>The Color Purple - Alice Walker</title>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+<!-- Fonts: Anime/Manga Style -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&family=Indie+Flower&family=Kosugi+Maru&display=swap" rel="stylesheet">
 
 <style>
-/* GENERAL STYLING */
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: 'Cormorant Garamond', serif;
-  background: linear-gradient(to bottom, #1b1a27, #232430);
-  color: #e6e4df;
-  overflow-x: hidden;
-}
-a { text-decoration:none; color:#d4af37; }
-a:hover { color:#fff; }
+    /* VARIABLES */
+    :root {
+        --bg-color: #1a1025;
+        --primary: #ff5eb4; /* Neon Pink */
+        --secondary: #00e5ff; /* Cyan */
+        --accent: #ffd700; /* Anime Gold */
+        --card-bg: rgba(30, 20, 50, 0.85);
+        --text-color: #f0f0f0;
+        
+        --font-heading: 'Kosugi Maru', sans-serif;
+        --font-body: 'Fredoka', sans-serif;
+        --font-hand: 'Indie Flower', cursive;
+    }
 
-h1,h2,h3,h4 { font-family:'Cinzel Decorative', serif; color:#d4af37; }
-header { text-align:center; padding:50px 20px; }
-h1 { font-size:clamp(3rem,6vw,5rem); }
-h2 { font-size:2.5rem; margin-top:10px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-.content-container { max-width:1000px; margin:auto; padding:100px 20px 20px; }
+    body {
+        font-family: var(--font-body);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        overflow-x: hidden;
+        /* Dot pattern */
+        background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
 
-/* TIMELINE */
-.timeline { display:flex; justify-content:space-between; margin-top: -80px; margin-bottom: 40px; position:relative; }
-.timeline::before { content:''; position:absolute; top:50%; left:5%; right:5%; height:4px; background:#d4af37; z-index:0; border-radius:2px; }
-.timeline-point { z-index:1; text-align:center; cursor:pointer; }
-.timeline-point:hover h4 { color:#fff; transform:scale(1.1); }
-.timeline-point h4 { transition:0.3s; }
+    /* SCREENS */
+    .screen {
+        display: none;
+        width: 100%;
+        min-height: 100vh;
+        position: relative;
+    }
+    .screen.active { display: flex; flex-direction: column; }
 
-/* CHARACTER CARDS */
-.character-container { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
-.character-card { background:#2a2a34; padding:20px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.5); width:200px; transition:transform 0.3s; cursor:pointer; }
-.character-card:hover { transform:translateY(-10px) scale(1.05); }
-.character-card img { width:100%; border-radius:10px; margin-bottom:10px; }
-.character-card p { font-size:0.9rem; }
+    /* TITLE SCREEN */
+    #title-screen {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background: linear-gradient(135deg, #2a0845 0%, #6441a5 100%);
+    }
 
-/* QUOTES / MODAL CONTENT */
-.quote { background: rgba(212,175,55,0.1); border-left:4px solid #d4af37; margin:20px 0; padding:15px 20px; font-style:italic; }
-.quote:hover { background: rgba(212,175,55,0.3); transform:scale(1.02); transition:0.3s; }
+    h1 {
+        font-family: var(--font-heading);
+        font-size: 4rem;
+        background: linear-gradient(to right, var(--primary), #fff, var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+        text-shadow: 0 0 20px rgba(255, 94, 180, 0.5);
+    }
 
-/* BACK BUTTON */
-.back-btn { position: fixed; top:20px; left:20px; padding:10px 20px; border:2px solid #d4af37; border-radius:6px; color:#d4af37; background:transparent; z-index:1000; transition:0.3s; }
-.back-btn:hover { background:#d4af37; color:#232430; }
+    .subtitle {
+        font-family: var(--font-hand);
+        font-size: 1.5rem;
+        color: var(--accent);
+        letter-spacing: 2px;
+        margin-bottom: 50px;
+    }
 
-/* ANALYSIS CONTAINER */
-.analysis-container { background:#2a2a34; padding:20px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.5); text-align:justify; }
-.analysis-container .analysis-text { font-size:1rem; line-height:1.6; }
+    .start-btn {
+        padding: 20px 60px;
+        font-size: 1.5rem;
+        font-family: var(--font-heading);
+        background: var(--primary);
+        color: white;
+        border: 4px solid rgba(255,255,255,0.3);
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 0 30px var(--primary);
+        transition: 0.2s;
+        text-transform: uppercase;
+    }
+    .start-btn:hover {
+        transform: scale(1.05);
+        background: #ff85c8;
+    }
 
-/* AUTHOR CARD */
-.author-card {
-  background:#2a2a34;
-  padding:15px;
-  border-radius:15px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.5);
-  text-align:center;
-  width:250px;
-  margin:30px auto;
-}
-.author-card h4 {
-  color:#d4af37;
-  margin-bottom:10px;
-}
+    /* VN SCREEN */
+    #vn-screen {
+        background-image: url('attached_assets/generated_images/anime_style_rural_landscape_at_sunset.png');
+        background-size: cover;
+        background-position: center;
+        justify-content: flex-end;
+        padding-bottom: 50px;
+    }
+    
+    .character-sprite {
+        position: absolute;
+        bottom: 0;
+        left: 5%;
+        height: 70vh;
+        z-index: 1;
+        filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));
+        display: flex;
+        align-items: flex-end;
+    }
+    
+    .character-sprite img {
+        height: 100%;
+        width: auto;
+    }
 
-/* PLAY GAME SECTION */
-#play-game { margin-top:30px; padding:20px; background:#2a2a34; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.5); }
-#play-game h3 { margin-bottom:15px; text-align:center; }
-#play-game button { margin:5px; padding:10px 15px; border:2px solid #d4af37; background:transparent; color:#d4af37; border-radius:5px; cursor:pointer; transition:0.3s; }
-#play-game button:hover { background:#d4af37; color:#232430; }
+    .dialogue-box {
+        position: relative;
+        z-index: 10;
+        width: 90%;
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(0, 0, 0, 0.85);
+        border: 2px solid var(--primary);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 0 20px var(--primary);
+        cursor: pointer;
+    }
 
-/* MODAL */
-.modal { 
-  display:none; 
-  position:fixed; 
-  z-index:2000; 
-  left:0; top:0; 
-  width:100%; height:100%; 
-  background-color:rgba(0,0,0,0.7); 
-  align-items:center; 
-  justify-content:center;
-}
-.modal.show { display:flex; }
-.modal-content { 
-  background-color:#2a2a34; 
-  padding:20px; 
-  border:2px solid #d4af37; 
-  width:90%; max-width:600px; 
-  border-radius:15px; 
-  box-shadow:0 10px 25px rgba(0,0,0,0.5); 
-  text-align:center;
-}
-.modal-content button { margin:5px; padding:10px 15px; border:2px solid #d4af37; background:transparent; color:#d4af37; border-radius:5px; cursor:pointer; transition:0.3s; }
-.modal-content button:hover { background:#d4af37; color:#232430; }
-.modal-close { float:right; font-size:1.5rem; cursor:pointer; color:#d4af37; }
+    .name-tag {
+        position: absolute;
+        top: -20px;
+        left: 20px;
+        background: var(--primary);
+        color: white;
+        padding: 5px 30px;
+        font-family: var(--font-heading);
+        font-size: 1.2rem;
+        transform: skewX(-10deg);
+        box-shadow: 5px 5px 0 rgba(0,0,0,0.5);
+    }
 
-section { opacity:0; transform:translateY(30px); transition: all 0.8s ease-in-out; margin-bottom:50px; }
-section.visible { opacity:1; transform:translateY(0); }
+    .dialogue-text {
+        font-family: var(--font-hand);
+        font-size: 1.8rem;
+        color: white;
+        line-height: 1.4;
+    }
+
+    .continue-indicator {
+        position: absolute;
+        bottom: 10px;
+        right: 20px;
+        color: var(--accent);
+        animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    /* ARCHIVE SCREEN */
+    #archive-screen {
+        padding: 50px 20px;
+        background: var(--bg-color);
+        overflow-y: auto;
+    }
+
+    .archive-nav {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    .archive-nav button {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: var(--font-heading);
+    }
+    .archive-nav button.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        box-shadow: 0 0 15px var(--primary);
+    }
+
+    .archive-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .anime-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        overflow: hidden;
+        transition: 0.3s;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .anime-card:hover {
+        transform: translateY(-10px) rotate(1deg);
+        box-shadow: 10px 10px 0 var(--secondary);
+        border-color: var(--secondary);
+    }
+
+    .card-top-bar { height: 8px; width: 100%; }
+    .bg-primary { background-color: var(--primary); }
+    .bg-secondary { background-color: var(--secondary); }
+    .bg-accent { background-color: var(--accent); }
+
+    .card-content { padding: 25px; }
+    .card-content h3 { font-size: 1.8rem; margin-bottom: 10px; color: white; }
+    
+    /* GAME/QUIZ STYLES */
+    .quiz-container {
+        background: rgba(0,0,0,0.6);
+        border: 2px solid var(--accent);
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .quiz-question {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: var(--accent);
+    }
+    .quiz-options button {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        padding: 15px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: left;
+        transition: 0.2s;
+    }
+    .quiz-options button:hover {
+        background: var(--primary);
+        color: black;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: grid; } /* Grid for card layout */
+    .tab-content.active.block-layout { display: block; } /* Block for other layouts */
+
 </style>
 </head>
 <body>
-<a href="{{ url('/#projects') }}" class="back-btn">← Back</a>
 
-<header><h1>Oedipus Rex</h1>
-<p style="font-style:italic;">“I know you are sick to death, all of you, but sick as you are, not one is as sick as I”</p>
-</header>
+    <!-- TITLE SCREEN -->
+    <div id="title-screen" class="screen active">
+        <div>
+            <h1>The Color Purple</h1>
+            <p class="subtitle">Interactive Visual Novel</p>
+            <button class="start-btn" onclick="switchScreen('vn')">Start Story</button>
+        </div>
+        <button 
+    onclick="window.location.href = window.homeUrl;"
+    style="padding:10px; background:var(--primary); border-radius:50%; cursor:pointer; box-shadow:0 0 10px var(--primary); border:none;"
+    title="Back"
+>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" viewBox="0 0 24 24">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+    </svg>
+</button>
 
-<div class="content-container">
-
-  <div class="timeline">
-    <div class="timeline-point" onclick="showTimelineEvent('Heroic Age')"><h4>Heroic Age</h4></div>
-    <div class="timeline-point" onclick="showTimelineEvent('Greek Era')"><h4>Greek Era</h4></div>
-    <div class="timeline-point" onclick="showTimelineEvent('Roman Era')"><h4>Roman Era</h4></div>
-    <div class="timeline-point" onclick="showTimelineEvent('Patristic')"><h4>Patristic</h4></div>
-  </div>
-
-  <section>
-    <h3>Summary</h3>
-    <p>Thebes is suffering from a deadly plague, and King Oedipus pledges to end the suffering by finding the murderer of the former king, Laius. He consults the oracle at Delphi through his brother-in-law Creon, and the message comes back: the plague will only lift when Laius’s killer is punished. Oedipus aggressively pursues the truth, summoning the blind prophet Tiresias, who eventually reveals that Oedipus himself is the murderer. Furious, Oedipus accuses others and digs deeper, even as his wife Jocasta angrily urges him to stop believing in prophecies.</p>
-    <p>As the investigation continues, Oedipus learns from a messenger and a shepherd that he was adopted and that his real parents are Jocasta and Laius — which means he has fulfilled the prophecy: he killed his father and married his mother. Horrified, Jocasta kills herself, and Oedipus blinds himself with her brooches. In his final act, he asks Creon to exile him and to care for his daughters, and he accepts the terrible truth of his fate, showing how even a great king cannot outrun prophecy.</p>
-  </section>
-
-  <section>
-    <h3>Main Characters</h3>
-    <div class="character-container">
-      <div class="character-card">
-        <img src="/images/oedipus.jpg" alt="Oedipus">
-        <p><strong>Oedipus:</strong> King of Thebes, determined to find the truth about King Laius’ murder, and ultimately discovers that he himself is the killer.</p>
-      </div>
-      <div class="character-card">
-        <img src="/images/jocasta.jpg" alt="Oedipus">
-        <p><strong>Jocasta:</strong> Oedipus’ wife and mother, who tries to stop him from discovering the truth and ends her life when the truth is revealed.</p>
-      </div>
-      <div class="character-card">
-        <img src="/images/creon.jpg" alt="Oedipus">
-        <p><strong>Creon:</strong> Oedipus’ brother-in-law and wise advisor who brings messages from the oracle and tries to maintain order.</p>
-      </div>
-      <div class="character-card">
-        <img src="/images/tiresias.jpg" alt="Oedipus">
-        <p><strong>Tiresias:</strong> The blind prophet who knows the truth about Oedipus and reluctantly reveals it, warning him of the consequences.</p>
-      </div>
     </div>
-  </section>
 
-  <section>
-    <h3>About the Author</h3>
-    <div class="author-card">
-      <h4>Homer</h4>
-      <p>Homer is known as the ancient Greek poet traditionally believed to have written <em>The Iliad</em> and <em>The Odyssey</em>. His works shaped Greek culture, influenced later literature, and continue to be studied today for their storytelling and themes about heroism, honor, and human emotion.</p>
+    <!-- VN SCREEN -->
+    <div id="vn-screen" class="screen">
+        <button style="position:absolute; top:20px; right:20px; background:rgba(0,0,0,0.5); color:white; border:1px solid white; padding:10px;" onclick="switchScreen('archive')">SKIP >></button>
+        
+        <div class="character-sprite">
+            <img src="/images/celie-art.png"  alt="Celie">
+        </div>
+
+        <div class="dialogue-box" onclick="advanceDialogue()">
+            <div class="name-tag" id="speaker-name">Celie</div>
+            <p class="dialogue-text" id="dialogue-text"></p>
+            <div class="continue-indicator">▼</div>
+        </div>
     </div>
-  </section>
 
-  <section id="play-game">
-    <h3>Interactive Games</h3>
-    <div style="text-align:center;">
-      <button id="playYes">Play Now</button>
+    <!-- ARCHIVE SCREEN -->
+    <div id="archive-screen" class="screen">
+        <div class="archive-header">
+            <h2 style="font-size:2rem; color:white;">/// The Color Purple Archives</h2>
+        </div>
+
+        <div class="archive-nav">
+            <button class="active" onclick="switchTab('chars')">Characters</button>
+            <button onclick="switchTab('themes')">Themes</button>
+            <button onclick="switchTab('author')">Author</button>
+            <button onclick="switchTab('games')">Games</button>
+            <button onclick="location.reload()" style="border-color: #ff5eb4; color: #ff5eb4;">EXIT</button>
+            
+        </div>
+
+        <!-- CHARACTERS TAB -->
+        <div id="tab-chars" class="tab-content active grid">
+            <div class="anime-card">
+                <div class="card-top-bar bg-primary"></div>
+                <div class="card-content">
+                    <h3>Celie</h3>
+                    <p>Protagonist. Transforms from victim to independent woman.</p>
+                </div>
+            </div>
+            <div class="anime-card">
+                <div class="card-top-bar bg-accent"></div>
+                <div class="card-content">
+                    <h3>Shug Avery</h3>
+                    <p>Catalyst. Teaches Celie about love and confidence.</p>
+                </div>
+            </div>
+             <div class="anime-card">
+                <div class="card-top-bar bg-secondary"></div>
+                <div class="card-content">
+                    <h3>Nettie</h3>
+                    <p>Observer. Missionary in Africa, keeper of history.</p>
+                </div>
+            </div>
+             <div class="anime-card">
+                <div class="card-top-bar bg-primary"></div>
+                <div class="card-content">
+                    <h3>Sofia</h3>
+                    <p>Warrior. Fights oppression physically.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- THEMES TAB -->
+        <div id="tab-themes" class="tab-content grid">
+             <div class="anime-card">
+                <div class="card-content">
+                    <h3>Voice & Letters</h3>
+                    <p>Writing is Celie's path to self-discovery and survival.</p>
+                </div>
+            </div>
+            <div class="anime-card">
+                <div class="card-content">
+                    <h3>Sisterhood</h3>
+                    <p>Quilting symbolizes women coming together.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUTHOR TAB -->
+        <div id="tab-author" class="tab-content grid">
+             <div class="anime-card">
+                <div class="card-content">
+                    <h3>Alice Walker</h3>
+                    <p>Alice Walker (born 1944) is an American novelist, poet, and activist, best known for her Pulitzer Prize-winning novel *The Color Purple* (1982), which explores racism, sexism, and personal growth in the American South. She is also a prominent voice in civil rights and feminist movements.</p>
+                    <img src="/images/alice.jpg" alt="alice" 
+     style="width: 30%; height: auto; border-radius: 8px; margin: 10px auto 0 auto; display: block;" />
+
+                </div>
+            </div>
+        </div> 
+
+        <!-- GAMES TAB -->
+        <div id="tab-games" class="tab-content block-layout">
+            <div class="quiz-container">
+                <div id="quiz-view">
+                    <h3 style="color:white; margin-bottom:10px;">KNOWLEDGE CHECK</h3>
+                    <p class="quiz-question" id="quiz-q">Who does Celie write to?</p>
+                    <div class="quiz-options" id="quiz-opts">
+                    </div>
+                    <p id="quiz-score" style="margin-top:20px; color:var(--secondary);"></p>
+                </div>
+            </div>
+        </div>
+
     </div>
-  </section>
-
-</div>
-
-<!-- MODAL -->
-<div id="gameModal" class="modal" aria-hidden="true">
-  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
-    <div id="gameContent"></div>
-  </div>
-</div>
 
 <script>
-// Scroll animation
-const sections = document.querySelectorAll('section');
-function revealSections() {
-  sections.forEach(sec => {
-    const top = sec.getBoundingClientRect().top;
-    if(top < window.innerHeight - 100) sec.classList.add('visible');
-  });
-}
-revealSections();
-window.addEventListener('scroll', revealSections);
+    // --- VN LOGIC ---
+    const SCRIPT = [
+        { speaker: "Celie", text: "Dear God... I am fourteen years old. I have always been a good girl." },
+        { speaker: "Celie", text: "Maybe you can give me a sign letting me know what is happening to me." },
+        { speaker: "Celie", text: "I don't know who else to tell. The world is so big, and I feel so small in this field." },
+        { speaker: "System", text: "Welcome to the Interactive Archive. Accessing files..." }
+    ];
 
-// Modal setup
-const modal = document.getElementById('gameModal');
-const gameContent = document.getElementById('gameContent');
-document.getElementById('playYes').onclick = openGameOptions;
+    let currentLine = 0;
+    let isTyping = false;
+    let typeInterval;
 
-modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId + '-screen').classList.add('active');
+        if(screenId === 'vn') {
+            currentLine = 0;
+            showDialogue(0);
+        }
+    }
 
-function openGameOptions() {
-  modal.classList.add('show');
-  modal.setAttribute('aria-hidden','false');
-  showActivityOptions();
-}
-function closeModal() {
-  modal.classList.remove('show');
-  modal.setAttribute('aria-hidden','true');
-}
+    function showDialogue(index) {
+        if(index >= SCRIPT.length) {
+            switchScreen('archive');
+            return;
+        }
+        const line = SCRIPT[index];
+        document.getElementById('speaker-name').innerText = line.speaker;
+        const textEl = document.getElementById('dialogue-text');
+        textEl.innerText = "";
+        isTyping = true;
+        let i = 0;
+        clearInterval(typeInterval);
+        typeInterval = setInterval(() => {
+            textEl.innerText += line.text.charAt(i);
+            i++;
+            if(i >= line.text.length) {
+                clearInterval(typeInterval);
+                isTyping = false;
+            }
+        }, 30);
+    }
 
-function showActivityOptions() {
-  gameContent.innerHTML = `
-    <span class="modal-close" id="closeModalBtn">&times;</span>
-    <h3>Select a Game</h3>
-    <div>
-      <button id="game1Btn">Who Would You Be?</button>
-      <button id="game2Btn">Theme Hunt</button>
-      <button id="game3Btn">What Happens Next</button>
-    </div>
-  `;
-  document.getElementById('closeModalBtn').onclick = closeModal;
-  document.getElementById('game1Btn').onclick = startGame1;
-  document.getElementById('game2Btn').onclick = startGame2;
-  document.getElementById('game3Btn').onclick = startGame3;
-}
+    function advanceDialogue() {
+        if(isTyping) {
+            clearInterval(typeInterval);
+            document.getElementById('dialogue-text').innerText = SCRIPT[currentLine].text;
+            isTyping = false;
+        } else {
+            currentLine++;
+            showDialogue(currentLine);
+        }
+    }
 
-// Game 1: Who Would You Be
-function startGame1() {
-  gameContent.innerHTML = `
-    <span class="modal-close" id="closeModalBtn">&times;</span>
-    <h3>Who Would You Be?</h3>
-    <p>Imagine you are Oedipus, Jocasta, or Tiresias during a key moment in the story. What would you do?</p>
-    <div>
-      <button onclick="alert('You chose to search for the truth no matter what!')">Search for the truth</button>
-      <button onclick="alert('You chose to ignore the prophecy!')">Ignore prophecy</button>
-      <button onclick="alert('You chose to warn others or hide the truth!')">Warn or hide the truth</button>
-    </div>
-    <button onclick="showActivityOptions()">Back to Games</button>
-  `;
-  document.getElementById('closeModalBtn').onclick = closeModal;
-}
+    // --- TAB LOGIC ---
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.archive-nav button').forEach(b => b.classList.remove('active'));
+        
+        const tab = document.getElementById('tab-' + tabId);
+        tab.classList.add('active');
+        // Add special class for layout if needed
+        if(tabId === 'games') tab.classList.add('block-layout');
+        
+        event.target.classList.add('active');
+    }
 
-// Game 2: Theme Hunt
-function startGame2() {
-  gameContent.innerHTML = `
-    <span class="modal-close" id="closeModalBtn">&times;</span>
-    <h3>Theme Hunt</h3>
-    <p>"Oedipus tore the brooches from Jocasta’s robe and blinded himself, grief and horror overwhelming him."</p>
-    <p>Which theme is shown here?</p>
-    <div>
-      <button onclick="alert('Fate, Pride, and Consequences')">Fate / Pride / Consequences</button>
-      <button onclick="alert('Humility')">Humility</button>
-    </div>
-    <button onclick="showActivityOptions()">Back to Games</button>
-  `;
-  document.getElementById('closeModalBtn').onclick = closeModal;
-}
+    // --- QUIZ LOGIC ---
+    const QUESTIONS = [
+        { q: "Who does Celie originally write her letters to?", opts: ["Her sister Nettie", "God", "Shug Avery", "Her mother"], a: 1 },
+        { q: "What does the quilt symbolize?", opts: ["Poverty", "Sisterhood & Unity", "A simple blanket", "Old traditions"], a: 1 },
+        { q: "What is the significance of the color purple?", opts: ["Royalty", "Sadness", "Appreciating life's beauty", "Anger"], a: 2 }
+    ];
+    let qIndex = 0;
+    let score = 0;
 
-// Game 3: What Happens Next
-function startGame3() {
-  gameContent.innerHTML = `
-    <span class="modal-close" id="closeModalBtn">&times;</span>
-    <h3>What Happens Next?</h3>
-    <p>You see Tiresias warning Oedipus that he is the cause of Thebes’ suffering. What do you think happens next?</p>
-    <div>
-      <button onclick="alert('Oedipus listens and accepts the truth')">Oedipus listens</button>
-      <button onclick="alert('Oedipus refuses to believe him and accuses others')">Oedipus accuses others</button>
-      <button onclick="alert('Oedipus leaves Thebes immediately')">Oedipus leaves</button>
-    </div>
-    <button onclick="showActivityOptions()">Back to Games</button>
-  `;
-  document.getElementById('closeModalBtn').onclick = closeModal;
-}
+    function loadQuiz() {
+        if(qIndex >= QUESTIONS.length) {
+            document.getElementById('quiz-view').innerHTML = `<h3>Quiz Complete!</h3><p style="font-size:2rem; color:var(--accent);">${score} / ${QUESTIONS.length}</p><button onclick="location.reload()" style="margin-top:20px; padding:10px; background:var(--primary); border:none; border-radius:5px; cursor:pointer;">Restart</button>`;
+            return;
+        }
+        const q = QUESTIONS[qIndex];
+        document.getElementById('quiz-q').innerText = q.q;
+        const optsDiv = document.getElementById('quiz-opts');
+        optsDiv.innerHTML = "";
+        q.opts.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(idx);
+            optsDiv.appendChild(btn);
+        });
+    }
 
-function showTimelineEvent(period){
-  gameContent.innerHTML = `
-    <span class="modal-close" id="closeModalBtn">&times;</span>
-    <h3>Period: ${period}</h3>
-    <p>Learn more about historical context and Greek tragedies here.</p>
-  `;
-  document.getElementById('closeModalBtn').onclick = closeModal;
-}
+    function checkAnswer(idx) {
+        if(idx === QUESTIONS[qIndex].a) score++;
+        qIndex++;
+        loadQuiz();
+    }
+    
+    // Init Quiz
+    loadQuiz();
+
 </script>
 
 </body>
